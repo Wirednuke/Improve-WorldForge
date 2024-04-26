@@ -73,7 +73,7 @@ public static class DependencyObjectExtensions
 public partial class EntitiesDocument : UserControl
 {
 	private Entity _draggedEntity;
-	
+
 	private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 	{
 		var viewModel = DataContext as EntitiesViewModel;
@@ -82,7 +82,13 @@ public partial class EntitiesDocument : UserControl
 			viewModel.SelectedEntity = e.NewValue as Entity;
 		}
 	}
-	
+
+	public void RefreshTreeView_OnButtonClick()
+	{
+		treeViewEntities.Items.Refresh();
+		treeViewEntities.UpdateLayout();
+	}
+
 	private void TreeView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 	{
 		var treeView = (TreeView)sender;
@@ -199,6 +205,12 @@ public partial class EntitiesDocument : UserControl
 			return null;
 
 	}
+
+    private void button_Click(object sender, RoutedEventArgs e)
+    {
+		treeViewEntities.Items.Refresh();
+
+    }
 }
 
 public class EntitiesViewModel : ObservableRecipient
