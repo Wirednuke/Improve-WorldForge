@@ -85,9 +85,9 @@ public partial class EntitiesDocument : UserControl
 
 	public void RefreshTreeView_OnButtonClick()
 	{
-		treeViewEntities.Items.Refresh();
-		treeViewEntities.UpdateLayout();
-	}
+        treeViewEntities.Items.Refresh();
+        treeViewEntities.UpdateLayout();
+    }
 
 	private void TreeView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 	{
@@ -208,8 +208,7 @@ public partial class EntitiesDocument : UserControl
 
     private void button_Click(object sender, RoutedEventArgs e)
     {
-		treeViewEntities.Items.Refresh();
-
+		RefreshTreeView_OnButtonClick();
     }
 }
 
