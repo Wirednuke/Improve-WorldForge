@@ -14,7 +14,7 @@ namespace Kesmai.WorldForge
 {
     public class PdfExportService
     {
-        private const int TileSize = 45; // Confirm this matches your application's tile size
+        private const int TileSize = 90; // Confirm this matches your application's tile size
 
         private readonly TerrainManager _terrainManager;
 
@@ -91,10 +91,10 @@ namespace Kesmai.WorldForge
                             SegmentTile tile = region.GetTile(x, y);
                             if (tile != null)
                             {
-                                int drawX = (x - bounds.left) * TileSize;
-                                int drawY = (y - bounds.top) * TileSize;
+                                var drawX = (x - bounds.left) * (TileSize * .5);
+                                var drawY = (y - bounds.top) * (TileSize * .5);
                                 Debug.WriteLine($"Drawing Tile: X={x}, Y={y}, DrawX={drawX}, DrawY={drawY}");
-                                RenderTile(g, tile, drawX, drawY);
+                                RenderTile(g, tile, (int)drawX, (int)drawY);
                             }
                         }
                     }
@@ -133,7 +133,7 @@ namespace Kesmai.WorldForge
                         ms.Seek(0, SeekOrigin.Begin);
                         using (var spriteImage = System.Drawing.Image.FromStream(ms))
                         {
-                            var destRect = new System.Drawing.Rectangle(x, y, TileSize, TileSize);
+                            var destRect = new System.Drawing.Rectangle(x-45, y, TileSize, TileSize);
                             
                             // Apply color tint
                             var colorMatrix = new ColorMatrix();
