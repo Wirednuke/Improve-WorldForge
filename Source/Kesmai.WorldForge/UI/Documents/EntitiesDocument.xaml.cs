@@ -209,8 +209,6 @@ public class EntitiesViewModel : ObservableRecipient
 		{
 		}
 	}
-	
-	
 
 	public class WfGroup : ObservableObject
 	{
@@ -229,7 +227,7 @@ public class EntitiesViewModel : ObservableRecipient
 				}
 			}
 		}
-		public ObservableCollection<Entity> Entities 
+		public ObservableCollection<Entity> Entities
 		{
 			get { return _entities; }
 			set
@@ -256,43 +254,11 @@ public class EntitiesViewModel : ObservableRecipient
 		}
 	}
 	
-	public class WfGroups : ObservableObject
-	{
-
-		public void ImportSegmentEntities(ObservableCollection<Entity> entities)
-		{
-			
-			
-			foreach (Entity entity in entities.OrderBy(e => e.Name))
-			{
-				if (entity.Group == null)
-					entity.Group = "Unassigned";
-				var group = Groups.Where(g => g.Name == entity.Group).FirstOrDefault();
-				if (group is null)
-				{
-					group = new WfGroup()
-					{
-						Name = entity.Group,
-						Entities = new ObservableCollection<Entity>()
-					};
-					Groups.Add(group);
-				}
-				group.Entities.Add(entity);
-			}
-			
-			
-		}
-		public ObservableCollection<WfGroup> Groups { get; set; } = new();
-	}
 	public ObservableCollection<WfGroup> Groups
 	{
 		get { return _groups.Groups; }
 	}
 	
-	public ObservableCollection<Entity> Entities
-	{
-		get { return _segment.Entities; }
-	}
 	public string Name => "(Entities)";
 
 	private int _newEntityCount = 1;
@@ -343,6 +309,32 @@ public class EntitiesViewModel : ObservableRecipient
 	public RelayCommand AddGroupCommand { get; set; }
 	
 	public RelayCommand<WfGroup> RemoveGroupCommand { get; set; }
+	
+	public class WfGroups : ObservableObject
+	{
+
+		public void ImportSegmentEntities(ObservableCollection<Entity> entities)
+		{
+			foreach (Entity entity in entities.OrderBy(e => e.Name))
+			{
+				if (entity.Group == null)
+					entity.Group = "Unassigned";
+				var group = Groups.Where(g => g.Name == entity.Group).FirstOrDefault();
+				if (group is null)
+				{
+					group = new WfGroup()
+					{
+						Name = entity.Group,
+						Entities = new ObservableCollection<Entity>()
+					};
+					Groups.Add(group);
+				}
+				group.Entities.Add(entity);
+			}
+		}
+		public ObservableCollection<WfGroup> Groups { get; set; } = new();
+	}
+
 
 	public EntitiesViewModel(Segment segment)
 	{
@@ -363,8 +355,7 @@ public class EntitiesViewModel : ObservableRecipient
 		ExportEntityCommand.DependsOn(() => SelectedEntity);
 
 		ImportEntityComamnd = new RelayCommand(ImportEntity);
-
-
+		
 		JumpSpawnerCommand = new RelayCommand(JumpSpawner);
 		
 		AddGroupCommand = new RelayCommand(AddGroup);
@@ -471,7 +462,21 @@ public class EntitiesViewModel : ObservableRecipient
 		if (entity.Clone() is Entity clonedEntity)
 		{
 			Source.Add(clonedEntity);
+			var unassigned = _groups.Groups.Where((x => x.Name == "Unassigned")).FirstOrDefault();
+			if (unassigned is not null)
+				unassigned.Entities.Add(clonedEntity);
+			else
+			{
+				var group = new WfGroup()
+				{
+					Name = "Unassigned",
+					Entities = new ObservableCollection<Entity>()
+				};
+				group.Entities.Add(clonedEntity);
+				_groups.Groups.Add(group);
+			}
 			SelectedEntity = clonedEntity;
+
 		}
 	}
 
