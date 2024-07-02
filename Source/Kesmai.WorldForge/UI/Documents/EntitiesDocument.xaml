@@ -52,6 +52,11 @@
                             CommandParameter="{Binding SelectedEntity}">
                         <Image Source="../../Resources/Delete.png" />
                     </Button>
+                    <Button Width="24" Height="24"
+                            Command="{Binding RemoveGroupCommand}"
+                            CommandParameter="{Binding SelectedGroup}">
+                        <Image Source="../../Resources/GreenX.png" />
+                    </Button>
                     <Separator />
                     <Button Width="24" Height="24"
                             Command="{Binding CopyEntityCommand}"

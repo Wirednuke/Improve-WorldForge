@@ -1,19 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml.Linq;
 using CommonServiceLocator;
-using DigitalRune.ServiceLocation;
 using Kesmai.WorldForge.Editor;
 using Kesmai.WorldForge.Scripting;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -89,7 +83,10 @@ public partial class EntitiesDocument : UserControl
 		var viewModel = DataContext as EntitiesViewModel;
 		if (viewModel != null)
 		{
-			viewModel.SelectedEntity = e.NewValue as Entity;
+			if (e.NewValue is Entity entity)
+				viewModel.SelectedEntity = e.NewValue as Entity;
+			else if (e.NewValue is EntitiesViewModel.WfGroup group)
+				viewModel.SelectedGroup = group;
 		}
 	}
 	
@@ -138,22 +135,7 @@ public partial class EntitiesDocument : UserControl
 		}
 	}
 
-	private void TextBox_Loaded(object sender, RoutedEventArgs e)
-	{
-		var textBox = sender as TextBox;
-		var dataContext = textBox.DataContext;
 
-		if (dataContext is Entity)
-		{
-			// DataContext is correctly set to an instance of the Entity class
-			Debug.WriteLine("DataContext is correctly set to an instance of the Entity class");
-		}
-		else
-		{
-			// DataContext is not set to an instance of the Entity class
-			Debug.WriteLine("DataContext is not set to an instance of the Entity class");
-		}
-	}
 
 	public class GetSelectedSpawner : RequestMessage<Spawner>
 	{
@@ -277,7 +259,17 @@ public class EntitiesViewModel : ObservableRecipient
 	private Entity _selectedEntity;
 	private Segment _segment;
 	private WfGroups _groups = new WfGroups();
-
+	private WfGroup _selectedGroup;
+	
+	public WfGroup SelectedGroup
+	{
+		get => _selectedGroup;
+		set
+		{
+			SetProperty(ref _selectedGroup, value, true);
+			OnPropertyChanged("SelectedGroup");
+		}
+	}
 	
 	public Entity SelectedEntity
 	{
@@ -409,11 +401,16 @@ public class EntitiesViewModel : ObservableRecipient
 	
 	public void RemoveGroup(WfGroup group)
 	{
+		if (group == null)
+		{
+			return;
+		}
+
 		var result = MessageBox.Show($"Are you sure you wish to delete '{group.Name}'?", 
 			"WorldForge", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
 		if (result != MessageBoxResult.No && _groups.Groups.Count > 0)
-			 _groups.Groups.Remove(group);
+			_groups.Groups.Remove(group);
 	}
 
 	public void AddEntity()
