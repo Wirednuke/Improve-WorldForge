@@ -73,7 +73,17 @@ public static class DependencyObjectExtensions
 public partial class EntitiesDocument : UserControl
 {
 	private Entity _draggedEntity;
-	
+	private void TextBlock_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+	{
+		if (sender is TextBlock textBlock && textBlock.DataContext is EntitiesViewModel.WfGroup group)
+		{
+			var dialog = new InputDialog("Enter new name", group.Name);
+			if (dialog.ShowDialog() == true)
+			{
+				group.Name = dialog.Input;
+			}
+		}
+	}
 	private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 	{
 		var viewModel = DataContext as EntitiesViewModel;
@@ -412,9 +422,14 @@ public class EntitiesViewModel : ObservableRecipient
 		{
 			Name = $"Entity {_newEntityCount++}",
 			Group = "Unassigned"
+			
+			
 		};
+		if (SelectedEntity.Group != null)
+			newEntity.Group = SelectedEntity.Group;
+		var entityGroup = _groups.Groups.Where(g => g.Name == newEntity.Group).FirstOrDefault();
 		
-		var unassigned = _groups.Groups.Where((x => x.Name == "Unassigned")).FirstOrDefault();
+		var unassigned = _groups.Groups.Where((x => x == entityGroup)).FirstOrDefault();
 		Source.Add(newEntity);
 		if (unassigned is not null)
 			unassigned.Entities.Add(newEntity);
@@ -462,21 +477,11 @@ public class EntitiesViewModel : ObservableRecipient
 		if (entity.Clone() is Entity clonedEntity)
 		{
 			Source.Add(clonedEntity);
-			var unassigned = _groups.Groups.Where((x => x.Name == "Unassigned")).FirstOrDefault();
-			if (unassigned is not null)
-				unassigned.Entities.Add(clonedEntity);
-			else
-			{
-				var group = new WfGroup()
-				{
-					Name = "Unassigned",
-					Entities = new ObservableCollection<Entity>()
-				};
-				group.Entities.Add(clonedEntity);
-				_groups.Groups.Add(group);
-			}
+			var group = clonedEntity.Group;
+			var wfGroup = _groups.Groups.Where(g => g.Name == group).FirstOrDefault();
+			wfGroup.Entities.Add(clonedEntity);
+	
 			SelectedEntity = clonedEntity;
-
 		}
 	}
 

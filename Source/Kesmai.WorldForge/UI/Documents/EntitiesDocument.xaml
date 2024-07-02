@@ -43,6 +43,11 @@
                         <Image Source="../../Resources/Add.png"/>
                     </Button>
                     <Button Width="24" Height="24"
+                            Command="{Binding AddGroupCommand}"
+                            ToolTip="Add Group">
+                        <Image Source="../../Resources/plus.png"/>
+                    </Button>
+                    <Button Width="24" Height="24"
                             Command="{Binding RemoveEntityCommand}"
                             CommandParameter="{Binding SelectedEntity}">
                         <Image Source="../../Resources/Delete.png" />
@@ -75,7 +80,9 @@
                       Drop="TreeView_Drop">
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding Entities}">
-                        <TextBlock AllowDrop="True" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock AllowDrop="True" 
+                                   Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" 
+                                   MouseRightButtonDown="TextBlock_MouseRightButtonDown"/>
                         <HierarchicalDataTemplate.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Name}" />
